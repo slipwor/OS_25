@@ -3,13 +3,14 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdlib.h>
-
+#define BYTES1 86
+#define BYTES2 92
 int main() {
 	int fd1[2], fd2[2], result;
 	//fd1 - файловые дескрипторы для передачи информации от родителя к ребёнку
 	//fd1 - файловые дескрипторы для передачи информации от ребёнка к родителю
 	size_t size;
-	char resstring1[86], resstring2[92];
+	char resstring1[BYTES1], resstring2[BYTES2];
 	//resstring1 - строка, полученная процессом-ребёнком
 	//resstring2 - строка, полученная процессом-родителем
 	if((pipe(fd1) < 0)||(pipe(fd2)<0)) {
@@ -26,8 +27,8 @@ int main() {
 			printf("Не удалось закрыть входной или выходной поток процесса-родителя\n");
 			exit(-1);
 		}
-		size = write(fd1[1], "Информация для дочернего процесса от родителя", 86);
-		if(size != 86) {
+		size = write(fd1[1], "Информация для дочернего процесса от родителя", BYTES1);
+		if(size != BYTES1) {
 			printf("Родителю не удалось записать всю строку в pipe\n");
 			exit(-1);
 		}
@@ -36,7 +37,7 @@ int main() {
 			exit(-1);
 		}
 		printf("Чистаем строку, отправленную процессом-ребёнком ...\n");
-		size = read(fd2[0], resstring2, 92);
+		size = read(fd2[0], resstring2, BYTES2);
 		if(size < 0) {
 			printf("Процессу-родителю не удалось прочитать строку\n");
 			exit(-1);											}
@@ -52,7 +53,7 @@ int main() {
 	                printf("Не удалось закрыть выходной или входной поток процесса-ребёнка\n");
 		        exit(-1);
 		}
-	        size = read(fd1[0], resstring1, 86);
+	        size = read(fd1[0], resstring1, BYTES1);
 		if(size < 0) {
 			printf("Процессу-ребёнку не удалось прочитать строку\n");
 			exit(-1);
@@ -62,8 +63,8 @@ int main() {
 			printf("Не удалось закрыть входной поток процесса-ребёнка\n");
 			exit(-1);
 		}
-		size = write(fd2[1], "Информация для родительского процесса от ребёнка", 92);
-		if(size != 92) {
+		size = write(fd2[1], "Информация для родительского процесса от ребёнка", BYTES2);
+		if(size != BYTES2) {
 			printf("Ребёнку не удалось записать всю строку в pipe\n");
 			exit(-1);
 		}
